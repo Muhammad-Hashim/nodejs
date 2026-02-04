@@ -105,35 +105,34 @@ jobs:
 
       - run: npm ci
 
-      - name: Apply Changesets
-        run: npx changeset version || echo "No changesets to process"
+      - name: Apply changesets
+        run: npx changeset version
 
-      - name: Get version
-        id: version
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Commit and tag
+      - name: Commit version bump
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
-          git diff-index --quiet HEAD || git commit -m "chore(release): v${{ steps.version.outputs.version }}"
-          git tag v${{ steps.version.outputs.version }}
-          git push origin main --tags
+          git diff-index --quiet HEAD || git commit -m "chore(release): update versions"
+          git push origin main
 
-      - name: Extract latest changelog
+      - name: Extract "What's Changed"
         id: changelog
         run: |
-          BODY=$(git show v${{ steps.version.outputs.version }}:CHANGELOG.md \
-                 | awk '/^## /{i++} i==1{print}')
+          BODY=$(awk '
+            /^## /{i++; next}
+            i==1 && NF {print}
+          ' CHANGELOG.md)
 
+          # Add bullet points only to content lines (ignore headers)
           BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){print}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
 
           if [ -z "$BODY" ]; then
-            BODY="- See CHANGELOG.md for details"
+            BODY="- No notable changes"
           fi
+
+          # Prepend a brief title
+          BODY="What's Changed\n\n$BODY"
 
           echo "body<<EOF" >> $GITHUB_OUTPUT
           printf "%s\n" "$BODY" >> $GITHUB_OUTPUT
@@ -142,7 +141,7 @@ jobs:
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
+          tag: v$(node -p "require('./package.json').version")
+          name: Release
           body: ${{ steps.changelog.outputs.body }}
           makeLatest: true
