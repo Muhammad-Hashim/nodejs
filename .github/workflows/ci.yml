@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       # Checkout repository with full history and token for pushing changes
@@ -28,25 +29,49 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Check if there are changesets to process
+      - name: Check for changesets
+        id: check_changesets
+        run: |
+          changeset_count=$(find .changeset -name "*.md" ! -name "README.md" ! -name "config.json" ! -name "fake-changeset-template.md" | wc -l)
+          if [ "$changeset_count" -gt 0 ]; then
+            echo "has_changesets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changesets=false" >> $GITHUB_OUTPUT
+          fi
+
       # Apply changesets to update versions and changelog
-      # This will update package.json version and CHANGELOG.md
       - name: Apply Changesets and Update Changelog
+        if: steps.check_changesets.outputs.has_changesets == 'true'
         run: |
           npx changeset version
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
+      # Get the new version from package.json
+      - name: Get version
+        if: steps.check_changesets.outputs.has_changesets == 'true'
+        id: get_version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> $GITHUB_OUTPUT
+
       # Extract the latest changelog section for the GitHub release
       - name: Extract latest changelog changes
+        if: steps.check_changesets.outputs.has_changesets == 'true'
         id: get_latest_changelog
         run: |
           if [ -f CHANGELOG.md ]; then
-            # Extract the first version section (most recent)
-            latest=$(awk '/^## [0-9]+\.[0-9]+\.[0-9]+/{if(++count==1){p=1;next}else if(p && /^## /){exit} p}' CHANGELOG.md)
+            # Extract content between first and second ## heading (latest version section)
+            latest=$(awk '/^## \[?[0-9]+\.[0-9]+\.[0-9]+/{if(++count==1){start=1;next}else if(start){exit}} start{print}' CHANGELOG.md)
+            if [ -z "$latest" ]; then
+              latest="See CHANGELOG.md for details"
+            fi
           else
             latest="No changelog changes detected"
           fi
           
+          # Handle multi-line output for GitHub Actions
           {
             echo "latest<<EOF"
             echo "$latest"
@@ -55,14 +80,17 @@ jobs:
 
       # Commit the changes and push
       - name: Commit and push changes
+        if: steps.check_changesets.outputs.has_changesets == 'true'
         run: |
-          git add CHANGELOG.md package.json
-          git commit -m "chore(release): update changelog" || echo "No changes to commit"
+          git add CHANGELOG.md package.json package-lock.json .changeset/
+          git commit -m "chore(release): version packages" || echo "No changes to commit"
           git push origin main
 
       - name: Create GitHub Release
+        if: steps.check_changesets.outputs.has_changesets == 'true'
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          tag: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
           body: ${{ steps.get_latest_changelog.outputs.latest }}
+          makeLatest: true
