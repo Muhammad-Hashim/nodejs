@@ -1,0 +1,66 @@
+name: Dev Release
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Apply Changesets (Pre-release)
+        run: npx changeset version --pre dev || echo "No changesets to process"
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git diff-index --quiet HEAD || git commit -m "chore(release): v${{ steps.version.outputs.version }}"
+          git tag v${{ steps.version.outputs.version }}
+          git push origin dev --tags
+
+      - name: Extract latest changelog
+        id: changelog
+        run: |
+          BODY=$(git show v${{ steps.version.outputs.version }}:CHANGELOG.md \
+                 | awk '/^## /{i++} i==1{print}')
+
+          BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){print}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
+
+          if [ -z "$BODY" ]; then
+            BODY="- See CHANGELOG.md for details"
+          fi
+
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          printf "%s\n" "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release (Pre-release)
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.version.outputs.version }}
+          name: Dev Release v${{ steps.version.outputs.version }}
+          body: ${{ steps.changelog.outputs.body }}
+          prerelease: true
+          makeLatest: false
