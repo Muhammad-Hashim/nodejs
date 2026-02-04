@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5
+
+### Patch Changes
+
+- 09f6193: Added new utility functions for file operations and improved API endpoints.
+
 ## 1.0.4
 
 ### Patch Changes
