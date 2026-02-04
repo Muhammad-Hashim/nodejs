@@ -89,6 +89,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.version.outputs.version }}
-          name: Release
+          name: v${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.body }}
           makeLatest: true
