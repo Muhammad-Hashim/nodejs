@@ -1,3 +1,8 @@
+
+
+
+
+
 # name: Release
 
 # on:
@@ -11,32 +16,26 @@
 #       contents: write
 
 #     steps:
-#       # 1. Checkout repository
 #       - uses: actions/checkout@v4
 #         with:
 #           fetch-depth: 0
 
-#       # 2. Setup Node.js
 #       - uses: actions/setup-node@v4
 #         with:
 #           node-version: 20
 #           cache: npm
 
-#       # 3. Install dependencies
 #       - run: npm ci
 
-#       # 4. Apply Changesets (exit cleanly if none)
 #       - name: Apply Changesets
 #         run: npx changeset version || echo "No changesets to process"
 
-#       # 5. Get the new version from package.json
 #       - name: Get version
 #         id: version
 #         run: |
 #           VERSION=$(node -p "require('./package.json').version")
 #           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-#       # 6. Commit changes and create a new tag
 #       - name: Commit and tag
 #         run: |
 #           git config user.name "github-actions"
@@ -46,29 +45,22 @@
 #           git tag v${{ steps.version.outputs.version }}
 #           git push origin main --tags
 
-#       # 7. Extract latest changelog section and add bullet points only to content lines
 #       - name: Extract latest changelog
 #         id: changelog
 #         run: |
-#           # Extract the latest section (first version block)
 #           BODY=$(git show v${{ steps.version.outputs.version }}:CHANGELOG.md \
 #                  | awk '/^## /{i++} i==1{print}')
 
-#           # Prepare the release body: 
-#           # - keep headers (##, ###) as-is
-#           # - add '-' only to content lines that do not start with #
 #           BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){print}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
 
 #           if [ -z "$BODY" ]; then
 #             BODY="- See CHANGELOG.md for details"
 #           fi
 
-#           # Preserve multi-line formatting for GitHub release
 #           echo "body<<EOF" >> $GITHUB_OUTPUT
 #           printf "%s\n" "$BODY" >> $GITHUB_OUTPUT
 #           echo "EOF" >> $GITHUB_OUTPUT
 
-#       # 8. Create GitHub Release
 #       - name: Create GitHub Release
 #         uses: ncipollo/release-action@v1
 #         with:
@@ -76,7 +68,6 @@
 #           name: Release v${{ steps.version.outputs.version }}
 #           body: ${{ steps.changelog.outputs.body }}
 #           makeLatest: true
-
 
 
 
@@ -105,44 +96,58 @@ jobs:
 
       - run: npm ci
 
+      # Apply changesets (ignore if none)
       - name: Apply Changesets
         run: npx changeset version || echo "No changesets to process"
 
+      # Get package version
       - name: Get version
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          if [ -z "$VERSION" ]; then
+            echo "Version is empty, exiting."
+            exit 1
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      # Commit changes and create annotated tag
       - name: Commit and tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
           git diff-index --quiet HEAD || git commit -m "chore(release): v${{ steps.version.outputs.version }}"
-          git tag v${{ steps.version.outputs.version }}
+          git tag -a v${{ steps.version.outputs.version }} -m "Release v${{ steps.version.outputs.version }}"
           git push origin main --tags
 
-      - name: Extract latest changelog
+      # Extract latest changelog section (without headers, only bullets)
+      - name: Extract "What's Changed"
         id: changelog
         run: |
-          BODY=$(git show v${{ steps.version.outputs.version }}:CHANGELOG.md \
-                 | awk '/^## /{i++} i==1{print}')
+          BODY=$(awk '
+            /^## /{i++; next}
+            i==1 && NF {print}
+          ' CHANGELOG.md)
 
-          BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){print}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
+          BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){next}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
 
           if [ -z "$BODY" ]; then
-            BODY="- See CHANGELOG.md for details"
+            BODY="- No notable changes"
           fi
+
+          # Prepend "What's Changed" title
+          BODY="What's Changed\n\n$BODY"
 
           echo "body<<EOF" >> $GITHUB_OUTPUT
           printf "%s\n" "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      # Create GitHub Release
       - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1s
         with:
           tag: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
+          name: Release
           body: ${{ steps.changelog.outputs.body }}
           makeLatest: true
