@@ -54,14 +54,20 @@ jobs:
       - name: Extract "What's Changed"
         id: changelog
         run: |
-          # Extract lines after the first ## heading
+          # Extract lines between the first and second ## headings (latest version)
           BODY=$(awk '
-            /^## /{i++; next}
-            i==1 && NF {print}
+            /^## [0-9]+\.[0-9]+\.[0-9]+/{if(found) exit; found=1; next}
+            found && /^## /{exit}
+            found && NF && !/^### /{print}
           ' CHANGELOG.md)
 
-          # Convert lines to bullets, skip headers and empty lines
-          BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){next}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
+          # Ensure proper bullet point formatting
+          BODY=$(echo "$BODY" | awk '
+            /^[[:space:]]*-/ {print}
+            /^[[:space:]]*[^-[:space:]]/ && NF {print "- "$0}
+            /^[[:space:]]*$/ {next}
+            /^### / {next}
+          ')
 
           # Default message if empty
           if [ -z "$BODY" ]; then
