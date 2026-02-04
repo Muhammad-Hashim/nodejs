@@ -35,23 +35,29 @@ jobs:
           npx changeset version
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add CHANGELOG.md package.json
-          git commit -m "chore(release): update changelog [skip ci]" || echo "No changes to commit"
-          git push origin main
 
+      # Extract the latest changelog section for the GitHub release
       - name: Extract latest changelog changes
         id: get_latest_changelog
         run: |
-          if git show HEAD:CHANGELOG.md >/dev/null 2>&1; then
-            latest=$(git show HEAD:CHANGELOG.md | awk '/^## /{if(++count==1){p=1;next}else if(p && /^## /){exit} p}')
+          if [ -f CHANGELOG.md ]; then
+            latest=$(awk '/^## /{if(++count==1){p=1;next}else if(p && /^## /){exit} p}' CHANGELOG.md)
           else
             latest="No changelog changes detected"
           fi
           
-          cat << EOF >> $GITHUB_OUTPUT
-          latest<<EOF
-          $latest
-          EOF
+          {
+            echo "latest<<EOF"
+            echo "$latest"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      # Commit the changes and push
+      - name: Commit and push changes
+        run: |
+          git add CHANGELOG.md package.json
+          git commit -m "chore(release): update changelog [skip ci]" || echo "No changes to commit"
+          git push origin main
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
