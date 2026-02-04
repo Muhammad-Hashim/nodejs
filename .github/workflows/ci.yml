@@ -54,20 +54,14 @@ jobs:
       - name: Extract "What's Changed"
         id: changelog
         run: |
-          # Extract lines between the first and second ## headings (latest version)
+          # Extract lines after the first ## heading
           BODY=$(awk '
-            /^## [0-9]+\.[0-9]+\.[0-9]+/{if(found) exit; found=1; next}
-            found && /^## /{exit}
-            found && NF && !/^### /{print}
+            /^## /{i++; next}
+            i==1 && NF {print}
           ' CHANGELOG.md)
 
-          # Ensure proper bullet point formatting
-          BODY=$(echo "$BODY" | awk '
-            /^[[:space:]]*-/ {print}
-            /^[[:space:]]*[^-[:space:]]/ && NF {print "- "$0}
-            /^[[:space:]]*$/ {next}
-            /^### / {next}
-          ')
+          # Convert lines to bullets, skip headers and empty lines
+          BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){next}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
 
           # Default message if empty
           if [ -z "$BODY" ]; then
@@ -89,6 +83,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
+          name: Release
           body: ${{ steps.changelog.outputs.body }}
           makeLatest: true
