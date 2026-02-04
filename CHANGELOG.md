@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+
+### Minor Changes
+
+- e2256a2: Added new things inside the project
+
 ## 2.2.0
 
 ### Minor Changes
