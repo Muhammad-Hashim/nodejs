@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.1
+
+### Patch Changes
+
+- db12ebb: add new CI/CD
+  Added a text view
+  Fixed alignment issue
+  Added a text view
+  Fixed alignment issue
+
 ## 1.2.0
 
 ### Minor Changes
