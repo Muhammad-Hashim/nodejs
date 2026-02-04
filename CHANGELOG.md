@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- 2c22417: Suppress Notifications – Users can mute notification sounds and message bubbles for Disjoint bot messages.
+  Edit Channel Configuration – Admins can update channel settings without reinstalling the bot.
+
 ## 1.1.0
 
 ### Minor Changes
