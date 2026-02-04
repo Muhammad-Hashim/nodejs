@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.9.1
+
+### Patch Changes
+
+- c4c816e: Add tage and relase name
+
 ## 2.9.0
 
 ### Minor Changes
