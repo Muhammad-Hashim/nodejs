@@ -46,22 +46,24 @@ jobs:
           git tag v${{ steps.version.outputs.version }}
           git push origin main --tags
 
-      # 7. Extract latest changelog section and convert lines to bullet points
+      # 7. Extract latest changelog section and add bullet points only to content lines
       - name: Extract latest changelog
         id: changelog
         run: |
-          # Get the first changelog section
+          # Extract the latest section (first version block)
           BODY=$(git show v${{ steps.version.outputs.version }}:CHANGELOG.md \
                  | awk '/^## /{i++} i==1{print}')
 
-          # Remove empty lines and add bullet points only in the release body
-          BODY=$(echo "$BODY" | sed '/^\s*$/d' | sed 's/^/- /')
+          # Prepare the release body: 
+          # - keep headers (##, ###) as-is
+          # - add '-' only to content lines that do not start with #
+          BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){print}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
 
           if [ -z "$BODY" ]; then
             BODY="- See CHANGELOG.md for details"
           fi
 
-          # Preserve multi-line bullet points in GitHub Actions output
+          # Preserve multi-line formatting for GitHub release
           echo "body<<EOF" >> $GITHUB_OUTPUT
           printf "%s\n" "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
