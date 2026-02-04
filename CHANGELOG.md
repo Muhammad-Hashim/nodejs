@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.9.0
+
+### Minor Changes
+
+- 0c58e3b: Corrected typo in CLI output
+  Resolved crash when parsing empty files
+  Updated README with new examples
+  Fixed broken link in documentation
+  Adjusted timeout handling in API calls
+  Fixed logging message formatting
+  Corrected version check in installer
+  Patched minor memory leak in parser
+  Fixed error handling for invalid inputs
+
 ## 2.8.0
 
 ### Minor Changes
