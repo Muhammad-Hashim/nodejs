@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.1
+
+### Patch Changes
+
+- 665a905: Fixed alignment issue in header
+  Corrected typo in CLI output
+  Resolved crash when parsing empty files
+  Updated README with new examples
+  Fixed broken link in documentation
+  Adjusted timeout handling in API calls
+  Fixed logging message formatting
+  Corrected version check in installer
+  Patched minor memory leak in parser
+  Fixed error handling for invalid inputs
+
 ## 2.1.0
 
 ### Minor Changes
