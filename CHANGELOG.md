@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0
+
+### Minor Changes
+
+- 659d342: adding CI/CD and alos new version
+
 ## 2.1.2
 
 ### Patch Changes
