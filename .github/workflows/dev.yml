@@ -32,16 +32,29 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Commit and tag
+        id: commit
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
-          git diff-index --quiet HEAD || git commit -m "chore(release): v${{ steps.version.outputs.version }}"
-          git tag v${{ steps.version.outputs.version }}
+          if git diff-index --quiet HEAD; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          VERSION="${{ steps.version.outputs.version }}"
+          if git rev-parse -q --verify "refs/tags/v$VERSION"; then
+            echo "Tag v$VERSION already exists; skipping."
+            echo "changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          git commit -m "chore(release): v$VERSION"
+          git tag v$VERSION
           git push origin dev --tags
+          echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Extract latest changelog
         id: changelog
+        if: steps.commit.outputs.changed == 'true'
         run: |
           BODY=$(git show v${{ steps.version.outputs.version }}:CHANGELOG.md \
                  | awk '/^## /{i++} i==1{print}')
@@ -58,6 +71,7 @@ jobs:
 
       - name: Create GitHub Release (Pre-release)
         uses: ncipollo/release-action@v1
+        if: steps.commit.outputs.changed == 'true'
         with:
           tag: v${{ steps.version.outputs.version }}
           name: Dev Release v${{ steps.version.outputs.version }}
