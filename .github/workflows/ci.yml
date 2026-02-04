@@ -29,7 +29,6 @@ jobs:
       - name: Apply Changesets
         run: npx changeset version || echo "No changesets to process"
 
-      # 5. Get the new version from package.json
       - name: Get version
         id: version
         run: |
