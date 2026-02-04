@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.3.0
+
+### Minor Changes
+
+- e2256a2: Added new things inside the project
+
+## 2.2.0
+
+### Minor Changes
+
+- 659d342: adding CI/CD and alos new version
+
+## 2.1.2
+
+### Patch Changes
+
+- dae2306: add new CI/CD
+
 ## 2.1.1
 
 ### Patch Changes
