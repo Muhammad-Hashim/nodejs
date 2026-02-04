@@ -1,3 +1,86 @@
+# name: Release
+
+# on:
+#   push:
+#     branches: [main]
+
+# jobs:
+#   release:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+
+#     steps:
+#       # 1. Checkout repository
+#       - uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       # 2. Setup Node.js
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
+#           cache: npm
+
+#       # 3. Install dependencies
+#       - run: npm ci
+
+#       # 4. Apply Changesets (exit cleanly if none)
+#       - name: Apply Changesets
+#         run: npx changeset version || echo "No changesets to process"
+
+#       # 5. Get the new version from package.json
+#       - name: Get version
+#         id: version
+#         run: |
+#           VERSION=$(node -p "require('./package.json').version")
+#           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+#       # 6. Commit changes and create a new tag
+#       - name: Commit and tag
+#         run: |
+#           git config user.name "github-actions"
+#           git config user.email "github-actions@github.com"
+#           git add .
+#           git diff-index --quiet HEAD || git commit -m "chore(release): v${{ steps.version.outputs.version }}"
+#           git tag v${{ steps.version.outputs.version }}
+#           git push origin main --tags
+
+#       # 7. Extract latest changelog section and add bullet points only to content lines
+#       - name: Extract latest changelog
+#         id: changelog
+#         run: |
+#           # Extract the latest section (first version block)
+#           BODY=$(git show v${{ steps.version.outputs.version }}:CHANGELOG.md \
+#                  | awk '/^## /{i++} i==1{print}')
+
+#           # Prepare the release body: 
+#           # - keep headers (##, ###) as-is
+#           # - add '-' only to content lines that do not start with #
+#           BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){print}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
+
+#           if [ -z "$BODY" ]; then
+#             BODY="- See CHANGELOG.md for details"
+#           fi
+
+#           # Preserve multi-line formatting for GitHub release
+#           echo "body<<EOF" >> $GITHUB_OUTPUT
+#           printf "%s\n" "$BODY" >> $GITHUB_OUTPUT
+#           echo "EOF" >> $GITHUB_OUTPUT
+
+#       # 8. Create GitHub Release
+#       - name: Create GitHub Release
+#         uses: ncipollo/release-action@v1
+#         with:
+#           tag: v${{ steps.version.outputs.version }}
+#           name: Release v${{ steps.version.outputs.version }}
+#           body: ${{ steps.changelog.outputs.body }}
+#           makeLatest: true
+
+
+
+
+
 name: Release
 
 on:
@@ -11,32 +94,26 @@ jobs:
       contents: write
 
     steps:
-      # 1. Checkout repository
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 2. Setup Node.js
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      # 3. Install dependencies
       - run: npm ci
 
-      # 4. Apply Changesets (exit cleanly if none)
       - name: Apply Changesets
         run: npx changeset version || echo "No changesets to process"
 
-      # 5. Get the new version from package.json
       - name: Get version
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # 6. Commit changes and create a new tag
       - name: Commit and tag
         run: |
           git config user.name "github-actions"
@@ -46,29 +123,22 @@ jobs:
           git tag v${{ steps.version.outputs.version }}
           git push origin main --tags
 
-      # 7. Extract latest changelog section and add bullet points only to content lines
       - name: Extract latest changelog
         id: changelog
         run: |
-          # Extract the latest section (first version block)
           BODY=$(git show v${{ steps.version.outputs.version }}:CHANGELOG.md \
                  | awk '/^## /{i++} i==1{print}')
 
-          # Prepare the release body: 
-          # - keep headers (##, ###) as-is
-          # - add '-' only to content lines that do not start with #
           BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){print}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
 
           if [ -z "$BODY" ]; then
             BODY="- See CHANGELOG.md for details"
           fi
 
-          # Preserve multi-line formatting for GitHub release
           echo "body<<EOF" >> $GITHUB_OUTPUT
           printf "%s\n" "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # 8. Create GitHub Release
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
