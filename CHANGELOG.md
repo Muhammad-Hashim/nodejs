@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.14.0
+
+### Minor Changes
+
+- c3a7d3e: - Updated README with new examples
+  - Fixed broken link in documentation
+  - Adjusted timeout handling in API calls
+  - Fixed logging message formatting
+  - Corrected version check in installer
+  - Patched minor memory leak in parser
+  - Fixed error handling for invalid inputs
+
 ## 2.13.2
 
 ### Patch Changes
