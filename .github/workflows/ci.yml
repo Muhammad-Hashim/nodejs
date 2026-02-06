@@ -54,8 +54,38 @@ jobs:
       - name: Extract "What's Changed"
         id: changelog
         run: |
-          # Use changesets to get changelog content
-          BODY=$(npx @changesets/changelog-github --since=${{ steps.version.outputs.version }} --tag=v${{ steps.version.outputs.version }} || echo "- No notable changes")
+          # Extract lines after the first ## heading
+          BODY=$(awk '
+            /^## /{i++; next}
+            i==1 && NF {print}
+          ' CHANGELOG.md)
+
+          # Process the content:
+          # 1. Remove commit hash from first line (keep only description)
+          # 2. Convert paragraph continuations to separate bullet points
+          # 3. Skip headers and empty lines
+          BODY=$(echo "$BODY" | awk '
+            /^#/ {next}
+            /^[[:space:]]*$/ {next}
+            /^- [0-9a-f]{7,}: / {
+              # Remove commit hash, keep description
+              desc = substr($0, index($0, ": ") + 2)
+              print "- " desc
+            }
+            /^[[:space:]]+/ {
+              # Convert continuation lines to bullet points
+              print "- " $0
+            }
+            /^- / && !/^[0-9a-f]{7,}: / {
+              # Keep existing bullet points without commit hash
+              print
+            }
+          ')
+
+          # Default message if empty
+          if [ -z "$BODY" ]; then
+            BODY="- No notable changes"
+          fi
 
           # Prepend ## What's Changed header and empty line
           BODY=$(printf "## What's Changed\n\n%s" "$BODY")
