@@ -61,12 +61,22 @@ jobs:
           ' CHANGELOG.md)
 
           # Process the content:
-          # 1. Remove commit hash from first line (keep only description)
+          # 1. Remove commit hash from first line and clean up
           # 2. Convert paragraph continuations to separate bullet points
           # 3. Skip headers and empty lines
+          # 4. Remove duplicate bullet prefixes
           BODY=$(echo "$BODY" | awk '
             /^#/ {next}
             /^[[:space:]]*$/ {next}
+            /^- [0-9a-f]{7,}: - / {
+              # Remove commit hash and duplicate bullet prefix
+              desc = substr($0, index($0, ": - ") + 4)
+              print "- " desc
+            }
+            /^[[:space:]]+- / {
+              # Remove indentation and keep bullet point
+              print substr($0, 2)
+            }
             /^- [0-9a-f]{7,}: / {
               # Remove commit hash, keep description
               desc = substr($0, index($0, ": ") + 2)
