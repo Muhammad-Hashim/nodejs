@@ -71,8 +71,9 @@ jobs:
             BODY="- No notable changes"
           fi
 
-          # Add header
-          BODY=$(printf "## What's Changed\n\n%s" "$BODY")
+          # Add header with commit hash
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BODY=$(printf "## What's Changed\n\n%s\n\n---\n\n$COMMIT_HASH" "$BODY")
 
           # Output for GitHub Actions
           echo "body<<EOF" >> $GITHUB_OUTPUT
