@@ -1,6 +1,81 @@
 # Changelog
 
+## 2.13.0
 
+### Minor Changes
+
+- 6888db7: - Updated README with new examples
+  - Fixed broken link in documentation
+  - Adjusted timeout handling in API calls
+  - Fixed logging message formatting
+  - Corrected version check in installer
+  - Patched minor memory leak in parser
+  - Fixed error handling for invalid inputs
+
+## 2.12.0
+
+### Minor Changes
+
+- 69d013c: - Updated README with new examples
+  - Fixed broken link in documentation
+  - Adjusted timeout handling in API calls
+  - Fixed logging message formatting
+  - Corrected version check in installer
+  - Patched minor memory leak in parser
+  - Fixed error handling for invalid inputs
+
+## 2.11.1
+
+### Patch Changes
+
+- 19ff62d: - Resolved crash when parsing empty files
+  - Updated README with new examples
+  - Fixed broken link in documentation
+  - Adjusted timeout handling in API calls
+  - Fixed logging message formatting
+  - Corrected version check in installer
+  - Patched minor memory leak in parser
+  - Fixed error handling for invalid inputs
+
+## 2.11.0
+
+### Minor Changes
+
+- 50cf349: - Resolved crash when parsing empty files
+  - Updated README with new examples
+  - Fixed broken link in documentation
+  - Adjusted timeout handling in API calls
+  - Fixed logging message formatting
+  - Corrected version check in installer
+  - Patched minor memory leak in parser
+  - Fixed error handling for invalid inputs
+
+## 2.10.0
+
+### Minor Changes
+
+- 734955b: - Resolved crash when parsing empty files
+  - Updated README with new examples
+  - Fixed broken link in documentation
+  - Adjusted timeout handling in API calls
+  - Fixed logging message formatting
+  - Corrected version check in installer
+  - Patched minor memory leak in parser
+  - Fixed error handling for invalid inputs
+
+## 2.9.2
+
+### Patch Changes
+
+- 5a55a60: Corrected typo in CLI output
+  Resolved crash when parsing empty files
+  Updated README with new examples
+  Fixed broken link in documentation
+  Adjusted timeout handling in API calls
+  Fixed logging message formatting
+  Corrected version check in installer
+  Patched minor memory leak in parser
+  Fixed error handling for invalid inputs
 
 ## 2.9.1
 
