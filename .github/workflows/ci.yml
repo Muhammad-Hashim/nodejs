@@ -68,8 +68,7 @@ jobs:
             /^[[:space:]]*$/d
             s/^- +[0-9a-f]{7,}:[[:space:]]*-?[[:space:]]*/- /g
             s/^- +-+/ - /g
-            /^-/ b
-            s/^[[:space:]]*/- /
+            /^[^-]/ s/^[[:space:]]*/- /
           ' | awk '!seen[$0]++ {print}')
 
           # Fallback if empty
