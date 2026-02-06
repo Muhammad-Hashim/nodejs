@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.13.0
+
+### Minor Changes
+
+- 6888db7: - Updated README with new examples
+  - Fixed broken link in documentation
+  - Adjusted timeout handling in API calls
+  - Fixed logging message formatting
+  - Corrected version check in installer
+  - Patched minor memory leak in parser
+  - Fixed error handling for invalid inputs
+
 ## 2.12.0
 
 ### Minor Changes
