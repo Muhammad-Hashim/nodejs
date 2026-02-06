@@ -1,181 +1,3 @@
-# name: Release
-
-
-
-# on:
-
-#   push:
-
-#     branches: [main]
-
-
-
-# jobs:
-
-#   release:
-
-#     runs-on: ubuntu-latest
-
-#     permissions:
-
-#       contents: write
-
-
-
-#     steps:
-
-#       # 1. Checkout repository
-
-#       - uses: actions/checkout@v4
-
-#         with:
-
-#           fetch-depth: 0
-
-
-
-#       # 2. Setup Node.js
-
-#       - uses: actions/setup-node@v4
-
-#         with:
-
-#           node-version: 20
-
-#           cache: npm
-
-
-
-#       # 3. Install dependencies
-
-#       - run: npm ci
-
-
-
-#       # 4. Apply changesets (ignore if none)
-
-#       - name: Apply Changesets
-
-#         run: npx changeset version || echo "No changesets to process"
-
-
-
-#       # 5. Get current version from package.json
-
-#       - name: Get version
-
-#         id: version
-
-#         run: |
-
-#           VERSION=$(node -p "require('./package.json').version")
-
-#           if [ -z "$VERSION" ]; then
-
-#             echo "Version is empty, exiting."
-
-#             exit 1
-
-#           fi
-
-#           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-
-
-#       # 6. Commit changes and create annotated tag
-
-#       - name: Commit and tag
-
-#         run: |
-
-#           git config user.name "github-actions"
-
-#           git config user.email "github-actions@github.com"
-
-#           git add .
-
-#           git diff-index --quiet HEAD || git commit -m "chore(release): v${{ steps.version.outputs.version }}"
-
-#           git tag -a v${{ steps.version.outputs.version }} -m "Release v${{ steps.version.outputs.version }}"
-
-#           git push origin main --tags
-
-
-
-#       # 7. Extract latest changelog and format "What's Changed"
-
-#       - name: Extract "What's Changed"
-
-#         id: changelog
-
-#         run: |
-
-#           # Extract lines after the first ## heading
-
-#           BODY=$(awk '
-
-#             /^## /{i++; next}
-
-#             i==1 && NF {print}
-
-#           ' CHANGELOG.md)
-
-
-
-#           # Convert lines to bullets, skip headers and empty lines
-
-#           BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){next}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
-
-
-
-#           # Default message if empty
-
-#           if [ -z "$BODY" ]; then
-
-#             BODY="- No notable changes"
-
-#           fi
-
-
-
-#           # Prepend ## What's Changed header and empty line
-
-#           BODY="## What's Changed
-
-
-
-#           $BODY"
-
-
-
-#           # Output multiline body for GitHub Actions
-
-#           echo "body<<EOF" >> $GITHUB_OUTPUT
-
-#           echo "$BODY" >> $GITHUB_OUTPUT
-
-#           echo "EOF" >> $GITHUB_OUTPUT
-
-
-
-#       # 8. Create GitHub Release
-
-#       - name: Create GitHub Release
-
-#         uses: ncipollo/release-action@v1
-
-#         with:
-
-#           tag: v${{ steps.version.outputs.version }}
-
-#           name: Release v${{ steps.version.outputs.version }}
-
-#           body: ${{ steps.changelog.outputs.body }}
-
-#           makeLatest: true
-
-
-
 name: Release
 
 on:
@@ -185,6 +7,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
 
@@ -218,76 +41,42 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # 6. Commit changes (package + changelog)
-      - name: Commit package + changelog changes
+      # 6. Commit changes and create annotated tag
+      - name: Commit and tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
           git diff-index --quiet HEAD || git commit -m "chore(release): v${{ steps.version.outputs.version }}"
+          git tag -a v${{ steps.version.outputs.version }} -m "Release v${{ steps.version.outputs.version }}"
+          git push origin main --tags
 
-      # 7. Build release body (changelog + commits) and create tag if missing
-      - name: Build release body and tag
+      # 7. Extract latest changelog and format "What's Changed"
+      - name: Extract "What's Changed"
         id: changelog
         run: |
-          set -euo pipefail
+          # Extract lines between the first and second ## headings
+          BODY=$(awk 'BEGIN{found=0} /^## /{ if(found==0){found=1; next} else exit } found==1{print}' CHANGELOG.md)
 
-          # Fetch tags to detect previous releases
-          git fetch --tags
-
-          VERSION=${{ steps.version.outputs.version }}
-          TAG=v${VERSION}
-
-          # Compute previous tag (if any)
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || true)
-
-          # Determine commit range
-          if [ -n "$PREV_TAG" ]; then
-            RANGE="$PREV_TAG..HEAD"
-          else
-            RANGE="HEAD"
-          fi
-
-          # Build commit list: short SHA + subject
-          COMMITS=$(git log --no-merges --pretty=format:'- %h %s' $RANGE || true)
-          if [ -z "$COMMITS" ]; then
-            COMMITS="- $(git rev-parse --short HEAD) No additional commits (single commit release)"
-          fi
-
-          # Extract first ## section from CHANGELOG.md
-          if [ -f CHANGELOG.md ]; then
-            RAW_BODY=$(awk 'BEGIN{found=0} /^## /{ if(found==0){found=1; next} else exit } found==1{print}' CHANGELOG.md)
-          else
-            RAW_BODY=""
-          fi
-
-          # Normalize changelog lines
-          CLEAN_BODY=$(printf "%s\n" "$RAW_BODY" | sed -E '
+          # Clean up lines: remove headers, empty lines, and normalize commit hashes
+          BODY=$(printf "%s\n" "$BODY" | sed -E '
             /^[[:space:]]*#/d
             /^[[:space:]]*$/d
             s/^- +[0-9a-f]{7,}:[[:space:]]*-?[[:space:]]*/- /g
             s/^- +-+/ - /g
-            /^[[:space:]]*-/! s/^[[:space:]]*/- /
           ' | awk '!seen[$0]++ {print}')
 
-          if [ -z "$CLEAN_BODY" ]; then
-            CLEAN_BODY="- No notable changes"
+          # Default message if nothing found
+          if [ -z "$BODY" ]; then
+            BODY="- No notable changes"
           fi
 
-          # Compose final body
-          FINAL_BODY=$(printf "Commit range: %s\n\n%s\n\n## What's Changed\n\n%s\n" "$RANGE" "$COMMITS" "$CLEAN_BODY")
+          # Add header
+          BODY=$(printf "## What's Changed\n\n%s" "$BODY")
 
-          # Create annotated tag only if it doesn't exist
-          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
-            echo "Tag ${TAG} already exists; skipping tag creation."
-          else
-            git tag -a "${TAG}" -m "Release ${TAG}"
-            git push origin "${TAG}"
-          fi
-
-          # Emit for next step
+          # Output for GitHub Actions
           echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$FINAL_BODY" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       # 8. Create GitHub Release
