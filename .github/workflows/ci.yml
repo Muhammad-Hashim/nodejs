@@ -54,23 +54,8 @@ jobs:
       - name: Extract "What's Changed"
         id: changelog
         run: |
-          # Extract lines after the first ## heading
-          BODY=$(awk '
-            /^## /{i++; next}
-            i==1 && NF {print}
-          ' CHANGELOG.md)
-
-          # Skip headers and empty lines, keep content exactly as written
-          BODY=$(echo "$BODY" | awk '
-            /^#/ {next}
-            /^[[:space:]]*$/ {next}
-            {print}
-          ')
-
-          # Default message if empty
-          if [ -z "$BODY" ]; then
-            BODY="No notable changes"
-          fi
+          # Use changesets to get changelog content
+          BODY=$(npx @changesets/changelog-github --since=${{ steps.version.outputs.version }} --tag=v${{ steps.version.outputs.version }} || echo "- No notable changes")
 
           # Prepend ## What's Changed header and empty line
           BODY=$(printf "## What's Changed\n\n%s" "$BODY")
