@@ -58,12 +58,12 @@ jobs:
           # Extract lines between the first and second ## headings
           BODY=$(awk 'BEGIN{found=0} /^## /{ if(found==0){found=1; next} else exit } found==1{print}' CHANGELOG.md)
 
-          # Clean up lines: remove headers, empty lines, and normalize commit hashes
+          # Clean up lines: remove headers, empty lines, normalize commit hashes, flatten bullets
           BODY=$(printf "%s\n" "$BODY" | sed -E '
             /^[[:space:]]*#/d
             /^[[:space:]]*$/d
             s/^- +[0-9a-f]{7,}:[[:space:]]*-?[[:space:]]*/- /g
-            s/^- +-+/ - /g
+            s/^[[:space:]]*-\s*/- /g
           ' | awk '!seen[$0]++ {print}')
 
           # Default message if nothing found
