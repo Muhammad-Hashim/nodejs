@@ -60,18 +60,20 @@ jobs:
             i==1 && NF {print}
           ' CHANGELOG.md)
 
-          # Convert lines to bullets, skip headers and empty lines
-          BODY=$(echo "$BODY" | awk '{if($0 ~ /^#/){next}else if($0 ~ /^[[:space:]]*$/){next}else{print "- "$0}}')
+          # Skip headers and empty lines, keep content exactly as written
+          BODY=$(echo "$BODY" | awk '
+            /^#/ {next}
+            /^[[:space:]]*$/ {next}
+            {print}
+          ')
 
           # Default message if empty
           if [ -z "$BODY" ]; then
-            BODY="- No notable changes"
+            BODY="No notable changes"
           fi
 
           # Prepend ## What's Changed header and empty line
-          BODY="## What's Changed
-
-          $BODY"
+          BODY=$(printf "## What's Changed\n\n%s" "$BODY")
 
           # Output multiline body for GitHub Actions
           echo "body<<EOF" >> $GITHUB_OUTPUT
@@ -83,6 +85,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.version.outputs.version }}
-          name: Release
+          name: Release v${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.body }}
           makeLatest: true
