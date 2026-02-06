@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.11.1
+
+### Patch Changes
+
+- 19ff62d: - Resolved crash when parsing empty files
+  - Updated README with new examples
+  - Fixed broken link in documentation
+  - Adjusted timeout handling in API calls
+  - Fixed logging message formatting
+  - Corrected version check in installer
+  - Patched minor memory leak in parser
+  - Fixed error handling for invalid inputs
+
 ## 2.11.0
 
 ### Minor Changes
