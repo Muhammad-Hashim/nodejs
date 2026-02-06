@@ -54,53 +54,32 @@ jobs:
       - name: Extract "What's Changed"
         id: changelog
         run: |
-          # Extract lines after the first ## heading
-          BODY=$(awk '
-            /^## /{i++; next}
-            i==1 && NF {print}
-          ' CHANGELOG.md)
+          # Capture lines after the first "## " heading until the next "## " (or EOF)
+          BODY=$(awk 'BEGIN{found=0} /^## /{ if(found==0){found=1; next} else exit } found==1{print}' CHANGELOG.md)
 
-          # Process the content:
-          # 1. Remove commit hash from first line and clean up
-          # 2. Convert paragraph continuations to separate bullet points
-          # 3. Skip headers and empty lines
-          # 4. Remove duplicate bullet prefixes
-          BODY=$(echo "$BODY" | awk '
-            /^#/ {next}
-            /^[[:space:]]*$/ {next}
-            /^- [0-9a-f]{7,}: - / {
-              # Remove commit hash and duplicate bullet prefix
-              desc = substr($0, index($0, ": - ") + 4)
-              print "- " desc
-            }
-            /^[[:space:]]+- / {
-              # Remove indentation and keep bullet point
-              print substr($0, 2)
-            }
-            /^- [0-9a-f]{7,}: / {
-              # Remove commit hash, keep description
-              desc = substr($0, index($0, ": ") + 2)
-              print "- " desc
-            }
-            /^[[:space:]]+/ {
-              # Convert continuation lines to bullet points
-              print "- " $0
-            }
-            /^- / && !/^[0-9a-f]{7,}: / {
-              # Keep existing bullet points without commit hash
-              print
-            }
-          ')
+          # Normalize:
+          # - remove headers and blank lines
+          # - remove commit-hash prefixes like "- 19ff62d: - " or "- 19ff62d: "
+          # - collapse duplicate leading "- -" into single "- "
+          # - prefix non-bulleted/indented lines with "- "
+          # - remove exact duplicate lines while preserving order
+          BODY=$(printf "%s\n" "$BODY" | sed -E '
+            /^[[:space:]]*#/d
+            /^[[:space:]]*$/d
+            s/^- +[0-9a-f]{7,}:[[:space:]]*-?[[:space:]]*/- /g
+            s/^- +-+/ - /g
+            /^-/ b
+            s/^[[:space:]]*/- /
+          ' | awk '!seen[$0]++ {print}')
 
-          # Default message if empty
+          # Fallback if empty
           if [ -z "$BODY" ]; then
             BODY="- No notable changes"
           fi
 
-          # Prepend ## What's Changed header and empty line
           BODY=$(printf "## What's Changed\n\n%s" "$BODY")
 
-          # Output multiline body for GitHub Actions
+          # Emit multiline output for use by later steps
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
