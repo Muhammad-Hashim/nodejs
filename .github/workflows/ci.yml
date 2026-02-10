@@ -7,6 +7,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
 
@@ -18,21 +19,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+
+      - run: npm ci
 
       - name: Apply Changesets
-        id: changesets
-        run: |
-          if npx changeset version; then
-            echo "changes_detected=true" >> $GITHUB_OUTPUT
-            echo "Changesets applied successfully"
-          else
-            echo "changes_detected=false" >> $GITHUB_OUTPUT
-            echo "No changesets to process"
-          fi
+        run: npx changeset version || echo "No changesets to process"
 
       - name: Get version
         id: version
-        if: steps.changesets.outputs.changes_detected == 'true'
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if [ -z "$VERSION" ]; then
@@ -42,7 +37,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Commit and tag
-        if: steps.changesets.outputs.changes_detected == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -53,9 +47,9 @@ jobs:
 
       - name: Extract "What's Changed"
         id: changelog
-        if: steps.changesets.outputs.changes_detected == 'true'
         run: |
           BODY=$(awk 'BEGIN{found=0} /^## /{ if(found==0){found=1; next} else exit } found==1{print}' CHANGELOG.md)
+
           BODY=$(printf "%s\n" "$BODY" | sed -E '
             /^[[:space:]]*#/d
             /^[[:space:]]*$/d
@@ -66,21 +60,17 @@ jobs:
           if [ -z "$BODY" ]; then
             BODY="- No notable changes"
           fi
+
           BODY=$(printf "## What's Changed\n\n%s" "$BODY")
+
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        if: steps.changesets.outputs.changes_detected == 'true'
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.version.outputs.version }}
           name: Release v${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.body }}
           makeLatest: true
-
-      - name: Skip Release Message
-        if: steps.changesets.outputs.changes_detected == 'false'
-        run: |
-          echo "No changes detected. Skipping release process."
