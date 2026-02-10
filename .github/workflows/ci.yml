@@ -7,32 +7,32 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
 
     steps:
-      # 1. Checkout repository
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 2. Setup Node.js
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
-      # 3. Install dependencies
-      - run: npm ci
-
-      # 4. Apply changesets (ignore if none)
       - name: Apply Changesets
-        run: npx changeset version || echo "No changesets to process"
+        id: changesets
+        run: |
+          if npx changeset version; then
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+            echo "Changesets applied successfully"
+          else
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+            echo "No changesets to process"
+          fi
 
-      # 5. Get current version from package.json
       - name: Get version
         id: version
+        if: steps.changesets.outputs.changes_detected == 'true'
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if [ -z "$VERSION" ]; then
@@ -41,8 +41,8 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # 6. Commit changes and create annotated tag
       - name: Commit and tag
+        if: steps.changesets.outputs.changes_detected == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -51,14 +51,11 @@ jobs:
           git tag -a v${{ steps.version.outputs.version }} -m "Release v${{ steps.version.outputs.version }}"
           git push origin main --tags
 
-      # 7. Extract latest changelog and format "What's Changed"
       - name: Extract "What's Changed"
         id: changelog
+        if: steps.changesets.outputs.changes_detected == 'true'
         run: |
-          # Extract lines between the first and second ## headings
           BODY=$(awk 'BEGIN{found=0} /^## /{ if(found==0){found=1; next} else exit } found==1{print}' CHANGELOG.md)
-
-          # Clean up lines: remove headers, empty lines, normalize commit hashes, flatten bullets
           BODY=$(printf "%s\n" "$BODY" | sed -E '
             /^[[:space:]]*#/d
             /^[[:space:]]*$/d
@@ -66,25 +63,24 @@ jobs:
             s/^[[:space:]]*-\s*/- /g
           ' | awk '!seen[$0]++ {print}')
 
-          # Default message if nothing found
           if [ -z "$BODY" ]; then
             BODY="- No notable changes"
           fi
-
-          # Add header with commit hash
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-          BODY=$(printf "## What's Changed\n\n%s\n\n---\n\n$COMMIT_HASH" "$BODY")
-
-          # Output for GitHub Actions
+          BODY=$(printf "## What's Changed\n\n%s" "$BODY")
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # 8. Create GitHub Release
       - name: Create GitHub Release
+        if: steps.changesets.outputs.changes_detected == 'true'
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.version.outputs.version }}
           name: Release v${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.body }}
           makeLatest: true
+
+      - name: Skip Release Message
+        if: steps.changesets.outputs.changes_detected == 'false'
+        run: |
+          echo "No changes detected. Skipping release process."
