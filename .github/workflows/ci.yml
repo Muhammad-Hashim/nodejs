@@ -10,7 +10,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     permissions:
       contents: write
-
+    
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,15 +23,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+
       - name: Apply Changesets
-        id: changesets
-        run: npx changeset version
+        run: npx changeset version || echo "No changesets to process"
 
       - name: Get version
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          [ -z "$VERSION" ] && exit 1
+          if [ -z "$VERSION" ]; then
+            echo "Version is empty, exiting."
+            exit 1
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Commit and tag
@@ -43,13 +46,23 @@ jobs:
           git tag -a v${{ steps.version.outputs.version }} -m "Release v${{ steps.version.outputs.version }}"
           git push origin main --tags
 
-      - name: Extract What's Changed
+      - name: Extract "What's Changed"
         id: changelog
         run: |
-          BODY=$(awk 'BEGIN{f=0} /^## /{if(f==0){f=1;next}else exit} f{print}' CHANGELOG.md)
-          [ -z "$BODY" ] && BODY="- No notable changes"
+          BODY=$(awk 'BEGIN{found=0} /^## /{ if(found==0){found=1; next} else exit } found==1{print}' CHANGELOG.md)
+          BODY=$(printf "%s\n" "$BODY" | sed -E '
+            /^[[:space:]]*#/d
+            /^[[:space:]]*$/d
+            s/^- +[0-9a-f]{7,}:[[:space:]]*-?[[:space:]]*/- /g
+            s/^[[:space:]]*-\s*/- /g
+          ' | awk '!seen[$0]++ {print}')
+
+          if [ -z "$BODY" ]; then
+            BODY="- No notable changes"
+          fi
+          BODY=$(printf "## What's Changed\n\n%s" "$BODY")
           echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "## What's Changed\n\n$BODY" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
