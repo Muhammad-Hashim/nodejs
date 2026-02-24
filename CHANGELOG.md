@@ -1,3 +1,81 @@
+# What’s New
+
+
+
+# [3.0.0](https://github.com/Muhammad-Hashim/nodejs/compare/v2.15.0...v3.0.0) (2026-02-24)
+
+
+### Bug Fixes
+
+* **auth:** Resolve authentication bypass vulnerability ([](https://github.com/Muhammad-Hashim/nodejs/commit/f2a3d9ac7d658f5d6ef70e5c52481002fc9f112f))
+* Configure npm publishing with scoped package name ([](https://github.com/Muhammad-Hashim/nodejs/commit/0c98f9d392f7670b8ee664ef5a34723a93e7b57c))
+* Correct Handlebars template syntax for release notes ([](https://github.com/Muhammad-Hashim/nodejs/commit/0aac8358d2e0534cd6162bbd27e9cd1f490c4f6b))
+* Rename release.config.js to release.config.cjs for ES module compatibility ([](https://github.com/Muhammad-Hashim/nodejs/commit/9699be0d8ee9e5563c78b82d474a652b88ee1b75))
+* Resolve memory leak in data processing ([](https://github.com/Muhammad-Hashim/nodejs/commit/62de574bb938ba601348131e3b4bbf1a59494f81))
+* Simplify release notes template to fix empty sections ([](https://github.com/Muhammad-Hashim/nodejs/commit/152ee5f65c4e66e3e0d6278546ec4cd8fde3ab20))
+* Sync package-lock.json version with package.json ([](https://github.com/Muhammad-Hashim/nodejs/commit/896c586be760259597540a265155e53bdc48f0fe))
+* Sync package-lock.json version with package.json ([](https://github.com/Muhammad-Hashim/nodejs/commit/665a7edb1136f3aa257b81fe7b6d6dd47ce52076))
+* Sync package-lock.json version with package.json ([](https://github.com/Muhammad-Hashim/nodejs/commit/a2298d33236f7308194b7753aba8e5d692ada169))
+* Update Node.js version to 24 for semantic-release compatibility ([](https://github.com/Muhammad-Hashim/nodejs/commit/3eaeaa2bc2fbe9a5be1d111fc5ccaddcbdc32c3c))
+
+
+### chore
+
+* **release:** 3.0.0 [skip ci] ([](https://github.com/Muhammad-Hashim/nodejs/commit/cfbb4b5e4b0d069b2da036ee2b23b75d2d5c7701))
+* **release:** 3.1.0 [skip ci] ([](https://github.com/Muhammad-Hashim/nodejs/commit/5cb8ee839ceccfb78a66be65d254ee6c73e677b0))
+* **release:** 3.2.0 [skip ci] ([](https://github.com/Muhammad-Hashim/nodejs/commit/3ed2cb0623f97feea4210676d79156992e53b0b9))
+* **release:** 3.2.1 [skip ci] ([](https://github.com/Muhammad-Hashim/nodejs/commit/351ac06698825f2ab9158e52c7bf8aa61b13c68b))
+* **release:** 4.0.0 [skip ci] ([](https://github.com/Muhammad-Hashim/nodejs/commit/2b866bdbb6d42280b9a2a5de43bb06a3954c5500))
+* **release:** 4.1.0 [skip ci] ([](https://github.com/Muhammad-Hashim/nodejs/commit/313b0feab96c330a248ba58d3b5cdc7ac25ab3bc))
+* **release:** 4.1.1 [skip ci] ([](https://github.com/Muhammad-Hashim/nodejs/commit/b8a64d8c1a10c7aa491370413828851c951ad656))
+* **release:** 4.2.0 [skip ci] ([](https://github.com/Muhammad-Hashim/nodejs/commit/894f285b0ddf030c1aeadfc6ead2dc07e5896a26))
+
+
+### Documentation
+
+* **api:** Update API documentation with examples ([](https://github.com/Muhammad-Hashim/nodejs/commit/9afbe22ce683e742e426e9ba9918e56dd3538905))
+* Update API documentation ([](https://github.com/Muhammad-Hashim/nodejs/commit/a722a72b21330d6c9501016b69cf7f9fc04515eb))
+* update README ([](https://github.com/Muhammad-Hashim/nodejs/commit/f6a21b583ae429d94fcccb8e47d2e7281d501172))
+* update README ([](https://github.com/Muhammad-Hashim/nodejs/commit/8339b8e0595eb9e712a32756ef7461849622d4fb))
+
+
+### Features
+
+* Add new authentication system ([](https://github.com/Muhammad-Hashim/nodejs/commit/aaf36bc5eef9c3e28d954ef28d377b521db2aeb0))
+* add new feature ([](https://github.com/Muhammad-Hashim/nodejs/commit/755578d3cc0311a110919ffbcfee782848f09a6a))
+* add new feature ([](https://github.com/Muhammad-Hashim/nodejs/commit/84e24c7b659771fbf82a31ce09ab13520208a1d0))
+* Add release sound notification system ([](https://github.com/Muhammad-Hashim/nodejs/commit/4918bf99b5eff7501ff879b443e384fc49123075))
+* Add structured release notes with sections ([](https://github.com/Muhammad-Hashim/nodejs/commit/8b6b86d16e9164c6d457d742d97f3a28ca6451ff))
+* Add test feature for release demonstration ([](https://github.com/Muhammad-Hashim/nodejs/commit/96d2c3cbd5a99ce582020193c9032cc70bc62788))
+* Configure semantic-release for local version updates ([](https://github.com/Muhammad-Hashim/nodejs/commit/84269aa48d34c43146e30b78eaa3ad327acf24be))
+* Enhance semantic-release configuration ([](https://github.com/Muhammad-Hashim/nodejs/commit/9b6617a3d16bd87825f6c99369d01f0d7bea34dd))
+* **payment:** Implement payment processing system ([](https://github.com/Muhammad-Hashim/nodejs/commit/99bdfc65bc1f316464c0e3cda91d7d4982af40fe))
+* Redesign authentication API ([](https://github.com/Muhammad-Hashim/nodejs/commit/282ea5fb0b95927e2e635ed9a5612f2a18e44cc0))
+* **user:** Add comprehensive user management service ([](https://github.com/Muhammad-Hashim/nodejs/commit/31ad497e3a30f1f083261012484c21e440b86547))
+
+
+### Refactoring
+
+* **db:** Optimize database connection pooling ([](https://github.com/Muhammad-Hashim/nodejs/commit/bdd14db4c8db97eb48120f3b47af73647e2f6d9f))
+* Improve service layer architecture ([](https://github.com/Muhammad-Hashim/nodejs/commit/464fbd3b6048784c7c302fd1528c891532a38db7))
+* Simplify version notification system ([](https://github.com/Muhammad-Hashim/nodejs/commit/61731286347d9f395c950e5a680b23732ad21214))
+
+
+### revert
+
+* Remove custom template, use default semantic-release format ([](https://github.com/Muhammad-Hashim/nodejs/commit/b63f80aebb820f4a744b6b00a39d0941b1d48d81))
+
+
+### BREAKING CHANGE
+
+* **payment:** Payment API endpoints completely redesigned
+
+- Add multi-provider payment support (Stripe, PayPal, Square)
+- Implement secure payment processing
+- Add refund functionality
+- Migrate from simple payment API to comprehensive system
+* Authentication endpoints completely changed
+
 # [4.2.0](https://github.com/Muhammad-Hashim/nodejs/compare/4.1.1...4.2.0) (2026-02-24)
 
 
