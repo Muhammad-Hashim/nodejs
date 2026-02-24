@@ -1,6 +1,6 @@
 {
   "name": "nodejs",
-  "version": "2.15.0",
+  "version": "4.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "version-packages": "changeset version",
     "release": "changeset publish",
     "test": "npm run build && node dist/index.js & sleep 2 && curl -f http://localhost:4000/getignore && curl -f http://localhost:4000/changeset/read && pkill -f 'node dist/index.js'",
-    "release:version": "changeset version && npm install"
+    "postversion": "node release-sounds.js"
   },
   "keywords": [],
   "author": "",
