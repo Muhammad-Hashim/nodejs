@@ -1,3 +1,25 @@
+# [3.0.0](https://github.com/Muhammad-Hashim/nodejs/compare/v2.15.0...3.0.0) (2026-02-24)
+
+
+### Bug Fixes
+
+* Rename release.config.js to release.config.cjs for ES module compatibility ([9699be0](https://github.com/Muhammad-Hashim/nodejs/commit/9699be0d8ee9e5563c78b82d474a652b88ee1b75))
+* Resolve memory leak in data processing ([62de574](https://github.com/Muhammad-Hashim/nodejs/commit/62de574bb938ba601348131e3b4bbf1a59494f81))
+* Update Node.js version to 24 for semantic-release compatibility ([3eaeaa2](https://github.com/Muhammad-Hashim/nodejs/commit/3eaeaa2bc2fbe9a5be1d111fc5ccaddcbdc32c3c))
+
+
+### Features
+
+* Add new authentication system ([aaf36bc](https://github.com/Muhammad-Hashim/nodejs/commit/aaf36bc5eef9c3e28d954ef28d377b521db2aeb0))
+* add new feature ([755578d](https://github.com/Muhammad-Hashim/nodejs/commit/755578d3cc0311a110919ffbcfee782848f09a6a))
+* add new feature ([84e24c7](https://github.com/Muhammad-Hashim/nodejs/commit/84e24c7b659771fbf82a31ce09ab13520208a1d0))
+* Redesign authentication API ([282ea5f](https://github.com/Muhammad-Hashim/nodejs/commit/282ea5fb0b95927e2e635ed9a5612f2a18e44cc0))
+
+
+### BREAKING CHANGES
+
+* Authentication endpoints completely changed
+
 # Changelog
 
 ## 2.15.0
