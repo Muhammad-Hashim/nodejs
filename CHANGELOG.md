@@ -1,3 +1,10 @@
+## [4.1.1](https://github.com/Muhammad-Hashim/nodejs/compare/4.1.0...4.1.1) (2026-02-24)
+
+
+### Bug Fixes
+
+* Sync package-lock.json version with package.json ([a2298d3](https://github.com/Muhammad-Hashim/nodejs/commit/a2298d33236f7308194b7753aba8e5d692ada169))
+
 # [4.1.0](https://github.com/Muhammad-Hashim/nodejs/compare/4.0.0...4.1.0) (2026-02-24)
 
 
