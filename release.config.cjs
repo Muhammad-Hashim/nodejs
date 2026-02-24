@@ -10,61 +10,29 @@ module.exports = {
       {
         preset: "angular",
         writerOpts: {
-          transform: (commit, context) => {
-            const issues = [];
-            
-            commit.notes.forEach(note => {
-              issues.push(note.title);
-            });
-            
-            if (commit.type === 'feat') {
-              return `✨ **New Feature**: ${commit.scope ? `**${commit.scope}**: ` : ''}${commit.subject}`;
-            } else if (commit.type === 'fix') {
-              return `🐛 **Bug Fix**: ${commit.scope ? `**${commit.scope}**: ` : ''}${commit.subject}`;
-            } else if (commit.type === 'docs') {
-              return `📚 **Documentation**: ${commit.scope ? `**${commit.scope}**: ` : ''}${commit.subject}`;
-            } else if (commit.type === 'refactor') {
-              return `♻️ **Refactoring**: ${commit.scope ? `**${commit.scope}**: ` : ''}${commit.subject}`;
-            } else if (commit.type === 'breaking') {
-              return `💥 **Breaking Change**: ${commit.scope ? `**${commit.scope}**: ` : ''}${commit.subject}`;
-            }
-            return `📝 **${commit.type}**: ${commit.scope ? `**${commit.scope}**: ` : ''}${commit.subject}`;
-          },
           mainTemplate: `
 ## 🎉 What's New in v{{nextRelease.version}}
 
-### ✨ New Features
 {{#each commits}}
 {{#if (eq this.type "feat")}}
-- {{this}}
+### ✨ New Features
+- {{this.subject}}
 {{/if}}
-{{/each}}
-
-### 🐛 Bug Fixes
-{{#each commits}}
 {{#if (eq this.type "fix")}}
-- {{this}}
+### 🐛 Bug Fixes  
+- {{this.subject}}
 {{/if}}
-{{/each}}
-
-### 📚 Documentation Updates
-{{#each commits}}
 {{#if (eq this.type "docs")}}
-- {{this}}
+### 📚 Documentation Updates
+- {{this.subject}}
 {{/if}}
-{{/each}}
-
+{{#if (eq this.type "refactor")}}
 ### ♻️ Code Improvements
-{{#each commits}}
-{{#if (or (eq this.type "refactor") (eq this.type "style") (eq this.type "chore"))}}
-- {{this}}
+- {{this.subject}}
 {{/if}}
-{{/each}}
-
-### 💥 Breaking Changes
-{{#each commits}}
 {{#if (eq this.type "breaking")}}
-- {{this}}
+### 💥 Breaking Changes
+- {{this.subject}}
 {{/if}}
 {{/each}}
 
@@ -72,9 +40,9 @@ module.exports = {
 
 ### 📦 Dependencies
 {{#if nextRelease.dependencies}}
-- Updated dependencies: {{nextRelease.dependencies}}
+Updated dependencies in this release.
 {{else}}
-- No dependency changes
+No dependency changes.
 {{/if}}
 
 ---
@@ -85,8 +53,6 @@ module.exports = {
 {{/each}}
 
 ---
-
-**🔗 Full Changelog**: [View all changes](https://github.com/{{owner}}/{{repository}}/compare/{{previousTag}}...{{nextRelease.gitTag}})
           `
         }
       }
