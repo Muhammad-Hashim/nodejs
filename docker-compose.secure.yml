@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  runner:
+    image: youssefbrr/github-actions:latest
+    restart: always
+    environment:
+      - REPO=${REPO}
+      - REG_TOKEN=${REG_TOKEN}
+      - NAME=${NAME}
+      - LABELS=${LABELS}
+      - WORKDIR=${WORKDIR}
+      - RUNNER_GROUP=${RUNNER_GROUP}
+      # Security environment variables
+      - RUNNER_ALLOW_RUNASROOT=0
+      - DISABLE_AUTO_UPDATE=1
+    deploy:
+      mode: replicated
+      replicas: ${REPLICAS}
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+          pids: 100
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+      - /var/tmp:noexec,nosuid,size=50m
+    volumes:
+      # Only mount what's absolutely necessary
+      - ${WORKDIR}:/actions-runner:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Remove if not needed
+    user: "1001:1001"  # Run as non-root user
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    networks:
+      - runner-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/_status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  runner-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Optional: Add monitoring service
+  monitoring:
+    image: prom/prometheus:latest
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - runner-network
+    profiles:
+      - monitoring
