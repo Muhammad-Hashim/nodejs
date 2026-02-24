@@ -1,3 +1,15 @@
+# What's New
+
+
+
+# [4.3.0](https://github.com/Muhammad-Hashim/nodejs/compare/4.2.0...4.3.0) (2026-02-24)
+
+
+### Features
+
+* Add 'What's New' template to changelog ([4aa0005](https://github.com/Muhammad-Hashim/nodejs/commit/4aa000598ed3f78d601d8fd1b3677ffd3e231baa))
+* Enhance semantic-release configuration ([9b6617a](https://github.com/Muhammad-Hashim/nodejs/commit/9b6617a3d16bd87825f6c99369d01f0d7bea34dd))
+
 # What’s New
 
 
