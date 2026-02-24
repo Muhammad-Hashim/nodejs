@@ -1,5 +1,19 @@
 ## 🎉 What's New in v
 
+
+---
+
+### 📦 Dependencies
+No dependency changes.
+
+---
+
+### 👥 Contributors
+
+---
+
+## 🎉 What's New in v
+
 ### ✨ New Features
 
 ### 🐛 Bug Fixes
