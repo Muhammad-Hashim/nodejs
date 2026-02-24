@@ -1,3 +1,31 @@
+# [4.0.0](https://github.com/Muhammad-Hashim/nodejs/compare/3.2.1...4.0.0) (2026-02-24)
+
+
+### Bug Fixes
+
+* **auth:** Resolve authentication bypass vulnerability ([f2a3d9a](https://github.com/Muhammad-Hashim/nodejs/commit/f2a3d9ac7d658f5d6ef70e5c52481002fc9f112f))
+
+
+### Features
+
+* **payment:** Implement payment processing system ([99bdfc6](https://github.com/Muhammad-Hashim/nodejs/commit/99bdfc65bc1f316464c0e3cda91d7d4982af40fe))
+* **user:** Add comprehensive user management service ([31ad497](https://github.com/Muhammad-Hashim/nodejs/commit/31ad497e3a30f1f083261012484c21e440b86547))
+
+
+### Reverts
+
+* Remove custom template, use default semantic-release format ([b63f80a](https://github.com/Muhammad-Hashim/nodejs/commit/b63f80aebb820f4a744b6b00a39d0941b1d48d81))
+
+
+### BREAKING CHANGES
+
+* **payment:** Payment API endpoints completely redesigned
+
+- Add multi-provider payment support (Stripe, PayPal, Square)
+- Implement secure payment processing
+- Add refund functionality
+- Migrate from simple payment API to comprehensive system
+
 ## 🎉 What's New in v
 
 
