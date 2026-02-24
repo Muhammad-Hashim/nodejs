@@ -1,3 +1,17 @@
+# [4.2.0](https://github.com/Muhammad-Hashim/nodejs/compare/4.1.1...4.2.0) (2026-02-24)
+
+
+### Bug Fixes
+
+* Configure npm publishing with scoped package name ([0c98f9d](https://github.com/Muhammad-Hashim/nodejs/commit/0c98f9d392f7670b8ee664ef5a34723a93e7b57c))
+* Sync package-lock.json version with package.json ([896c586](https://github.com/Muhammad-Hashim/nodejs/commit/896c586be760259597540a265155e53bdc48f0fe))
+* Sync package-lock.json version with package.json ([665a7ed](https://github.com/Muhammad-Hashim/nodejs/commit/665a7edb1136f3aa257b81fe7b6d6dd47ce52076))
+
+
+### Features
+
+* Configure semantic-release for local version updates ([84269aa](https://github.com/Muhammad-Hashim/nodejs/commit/84269aa48d34c43146e30b78eaa3ad327acf24be))
+
 ## [4.1.2](https://github.com/Muhammad-Hashim/nodejs/compare/4.1.1...4.1.2) (2026-02-24)
 
 
