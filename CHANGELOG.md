@@ -21,6 +21,31 @@
 
 ---
 
+**🔗 Full Changelog**: [View all changes](https://github.com/Muhammad-Hashim/nodejs/compare/3.1.0...)
+
+## 🎉 What's New in v
+
+### ✨ New Features
+
+### 🐛 Bug Fixes
+
+### 📚 Documentation Updates
+
+### ♻️ Code Improvements
+
+### 💥 Breaking Changes
+
+---
+
+### 📦 Dependencies
+- No dependency changes
+
+---
+
+### 👥 Contributors
+
+---
+
 **🔗 Full Changelog**: [View all changes](https://github.com/Muhammad-Hashim/nodejs/compare/3.0.0...)
 
 # [3.0.0](https://github.com/Muhammad-Hashim/nodejs/compare/v2.15.0...3.0.0) (2026-02-24)
