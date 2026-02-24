@@ -31,7 +31,7 @@ module.exports = {
             return `📝 **${commit.type}**: ${commit.scope ? `**${commit.scope}**: ` : ''}${commit.subject}`;
           },
           mainTemplate: `
-## 🎉 What's New in v${nextRelease.version}
+## 🎉 What's New in v{{nextRelease.version}}
 
 ### ✨ New Features
 {{#each commits}}
@@ -71,8 +71,8 @@ module.exports = {
 ---
 
 ### 📦 Dependencies
-{{#if this.dependencies}}
-- Updated dependencies: {{this.dependencies}}
+{{#if nextRelease.dependencies}}
+- Updated dependencies: {{nextRelease.dependencies}}
 {{else}}
 - No dependency changes
 {{/if}}
@@ -80,13 +80,13 @@ module.exports = {
 ---
 
 ### 👥 Contributors
-{{#each this.contributors}}
+{{#each nextRelease.contributors}}
 - {{this.name}} (@{{this.username}})
 {{/each}}
 
 ---
 
-**🔗 Full Changelog**: [View all changes](https://github.com/${owner}/${repository}/compare/${previousTag}...${nextRelease.gitTag})
+**🔗 Full Changelog**: [View all changes](https://github.com/{{owner}}/{{repository}}/compare/{{previousTag}}...{{nextRelease.gitTag}})
           `
         }
       }
