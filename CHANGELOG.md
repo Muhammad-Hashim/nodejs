@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/Muhammad-Hashim/nodejs/compare/4.0.0...4.1.0) (2026-02-24)
+
+
+### Features
+
+* Add release sound notification system ([4918bf9](https://github.com/Muhammad-Hashim/nodejs/commit/4918bf99b5eff7501ff879b443e384fc49123075))
+
 # [4.0.0](https://github.com/Muhammad-Hashim/nodejs/compare/3.2.1...4.0.0) (2026-02-24)
 
 
